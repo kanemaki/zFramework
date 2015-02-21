@@ -3,23 +3,23 @@
 /* ----------------------------------------------------------
 
 Classe    zGlbQueue
-Autor     J˙lio Wittwer
+Autor     J√∫lio Wittwer
 Data      08/02/2015
 Versao    1.150208
 
-DesriÁ„o  Classe para manipular fila global. Uma fila global em memoria
+Desri√ß√£o  Classe para manipular fila global. Uma fila global em memoria
           usa um cotainer de memoria global do Advpl, visivel por qualquer
-          thread no mesmo servidor de aplicaÁ„o. A classe garante uma
-          identificaÁ„o unica por ambiente ( environment ) para permitir
+          thread no mesmo servidor de aplica√ß√£o. A classe garante uma
+          identifica√ß√£o unica por ambiente ( environment ) para permitir
           mais de uma fila com mesmo nome no mesmo servidor onde as threads
           estao sendo executadas em environments diferentes no mesmo servidor. 
 
           O mecanismo de Dequeue() permite time-out de espera caso a lista
           esteja vazia, e caso seja feito um Enqueue() enquanto o processo 
-          est· em espera, a notificaÁ„o e processamento s„o feitos diretamente
-          via IpcGo() / IpcWaitEx() -- comunicaÁ„o nomeada entre processos, e
+          est√° em espera, a notifica√ß√£o e processamento s√£o feitos diretamente
+          via IpcGo() / IpcWaitEx() -- comunica√ß√£o nomeada entre processos, e
           pode haver mais de um processo de Enqueue() e Dequeue() rodando ao mesmo
-          tempo, pois o acesso ‡ fila global È semaforizada.
+          tempo, pois o acesso √† fila global √© semaforizada.
 
 Lista de Erros retornados 
 
@@ -71,7 +71,7 @@ Metodo New()
 Inicializa uma fila com um identificador no servidor atual 
 nMaxQueue = Tamanho maximo da fila. Default = 0 ( sem limite ) 
 cQueueId = Identificador globa da fila de elementos
-Caso a fila j· exista, ela n„o È limpa. 
+Caso a fila j√° exista, ela n√£o √© limpa. 
 ---------------------------------------------------------- */
                      
 METHOD NEW( cQueueId , nMaxQueue ) CLASS zGlbQueue
@@ -100,10 +100,10 @@ Return self
 /* ----------------------------------------------------------
 Metodo Enqueue()
 Acrescenta um item na fila de processamento
-Caso exista um ou mais processos esperando uma notificaÁ„o
-um dos processos em espera arbitrariamente ser· notificado na hora
+Caso exista um ou mais processos esperando uma notifica√ß√£o
+um dos processos em espera arbitrariamente ser√° notificado na hora
 Retorna o numero de elementos na fila apos acrescentar o elemento informado
-Em caso de falha na inserÁ„o, retorna um numero menor que zero.
+Em caso de falha na inser√ß√£o, retorna um numero menor que zero.
 ---------------------------------------------------------- */
 
 METHOD Enqueue( xRequest ) CLASS zGlbQueue
@@ -113,7 +113,7 @@ Local aItens := {}
 
 If IpcGo(::cGlbListId,xRequest)
 
-  // Antes de tentar usar a fila, tenta enviar direto a notificaÁ„o 
+  // Antes de tentar usar a fila, tenta enviar direto a notifica√ß√£o 
   // caso tenha conseguido, tinha algum processo aguardando
   // no dequeue(). Neste caso, retorna 0
   Return 0
@@ -163,11 +163,11 @@ Return len(aItens)
 /* --------------------------------------------------------
 Recupera e remove o primeiro item da lista. Caso nao haja ninguem
 na lista, espera por um tempo  determinado em milissegundos pela
-notificaÁ„o de insert O tempo default s„o 5000 ms ( 5 segundos )
-xRequest deve ser informado por referÍncia. Em caso de sucesso,
+notifica√ß√£o de insert O tempo default s√£o 5000 ms ( 5 segundos )
+xRequest deve ser informado por refer√™ncia. Em caso de sucesso,
 retorna o numero de requisicoes que ainda estao na fila.
-Quando for retirado o ultimo  elemento da fila, ser· retornado zero.
-Em caso de falha na inserÁ„o, retorna um numero menor que zero
+Quando for retirado o ultimo  elemento da fila, ser√° retornado zero.
+Em caso de falha na inser√ß√£o, retorna um numero menor que zero
 -------------------------------------------------------- */
 
 METHOD Dequeue( xRequest, nWait ) CLASS zGlbQueue
@@ -182,7 +182,7 @@ If nWait == NIL
   nWait := 5000
 ElseIf nWait < 100
   // Time-out muito baixo, nao premite tempo menor que 1/10 de segundo
-  // desse modo, tambÈm nao permite time-out zero ( esperar pra sempre ) 
+  // desse modo, tamb√©m nao permite time-out zero ( esperar pra sempre ) 
   nWait := 100
 Endif
 
@@ -192,7 +192,7 @@ If !GlbLockRetry()
 Endif
 
 // Os itens da fila estao em uma variavel global.
-// Realiza um lock global neste serviÁo, e pega os itens da fila
+// Realiza um lock global neste servi√ßo, e pega os itens da fila
 GetGlbVars(::cGlbListId,@aItens)
 
 If Len(aItens) > 0
@@ -217,8 +217,8 @@ Endif
 // Solta o lock global
 GlbUnlock()
 
-// Se chegou aqui, n„o tem itens na fila 
-// Aguarda por uma requisiÁ„o de Enqueue()
+// Se chegou aqui, n√£o tem itens na fila 
+// Aguarda por uma requisi√ß√£o de Enqueue()
 // pelo time-out especificado.
 
 If IpcWaitEx(::cGlbListId,nWait,@xRequest)
@@ -232,7 +232,7 @@ If IpcWaitEx(::cGlbListId,nWait,@xRequest)
 Endif
 
 // Apos esperar ... se nao recebeu nada 
-// Retorna que nao pegou nada, e n„o tem elementos na fila
+// Retorna que nao pegou nada, e n√£o tem elementos na fila
 Return ::SetError(-2,STR0002) // 'Queue List Empty'
 
 /* --------------------------------------------------------
@@ -278,7 +278,7 @@ METHOD SetError(nCode,cErrorMsg) CLASS zGlbQueue
 Return nCode
 
 /* ----------------------------------------------------
-Retorna string contendo codigo e descriÁ„o do ultimo erro 
+Retorna string contendo codigo e descri√ß√£o do ultimo erro 
 ---------------------------------------------------- */
 
 METHOD GetErrorStr() CLASS zGlbQueue
@@ -293,9 +293,9 @@ Caso o lock global nao esteja disponivel, tenta
 novamente 50 vezes em intervalos randomicos 
 de 15 a 25 milissegundos ( aprox 1 segundo ), e 
 retorna .F. se nao conseguiu um lock global 
-A reproduÁ„o desta ocorencia indica uma situaÁ„o de 
+A reprodu√ß√£o desta ocorencia indica uma situa√ß√£o de 
 stress de concorrencia pelo lock global ( muita 
-manutenÁ„o na lista ao mesmo tempo ) 
+manuten√ß√£o na lista ao mesmo tempo ) 
 -------------------------------------------------------------- */
 
 STATIC Function GlbLockRetry()
